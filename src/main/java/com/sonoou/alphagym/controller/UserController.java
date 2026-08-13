@@ -3,6 +3,7 @@ package com.sonoou.alphagym.controller;
 import com.sonoou.alphagym.dto.*;
 import com.sonoou.alphagym.entity.WorkoutEntity;
 import com.sonoou.alphagym.service.AnalyticsService;
+import com.sonoou.alphagym.service.RazorpayService;
 import com.sonoou.alphagym.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -17,10 +18,12 @@ public class UserController {
 
     private final UserService userService;
     private final AnalyticsService analyticsService;
+    private final RazorpayService razorpayService;
 
-    public UserController(UserService userService, AnalyticsService analyticsService) {
+    public UserController(UserService userService, AnalyticsService analyticsService, RazorpayService razorpayService) {
         this.userService = userService;
         this.analyticsService = analyticsService;
+        this.razorpayService = razorpayService;
     }
 
     @GetMapping("/profile")
@@ -114,5 +117,11 @@ public class UserController {
     public ResponseEntity<UserMembershipResponse> getUserMembership(Authentication authentication) {
         UserMembershipResponse response = userService.getUserMembership(authentication.getName());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/payments")
+    public ResponseEntity<List<PaymentHistoryResponse>> getUserPayments(Authentication authentication) {
+        List<PaymentHistoryResponse> history = razorpayService.getPaymentHistory(authentication.getName());
+        return ResponseEntity.ok(history);
     }
 }

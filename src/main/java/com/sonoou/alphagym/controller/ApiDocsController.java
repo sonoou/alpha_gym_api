@@ -36,18 +36,20 @@ public class ApiDocsController {
         endpoints.add(createEndpoint("Membership Plans", "POST", "/api/plans", "Create a new membership plan", true, Map.of("name", "VIP Plan", "amount", 3999.0, "currency", "INR", "durationMonths", 12), Map.of("id", 4, "name", "VIP Plan", "amount", 3999.0)));
 
         // 4. Payments (Razorpay)
-        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/create-order", "Create Razorpay payment order by planId (optional startDate YYYY-MM-DD, must be today or future)", true, Map.of("planId", 1, "startDate", "2026-08-15"), Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR")));
-        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/verify", "Verify Razorpay HMAC SHA256 payment signature & activate membership from startDate (today or future)", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "sig...", "planId", 1, "startDate", "2026-08-15"), Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully starting on 2026-08-15")));
+        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/create-order", "Create Razorpay payment order by planId (optional startDate YYYY-MM-DD)", true, Map.of("planId", 1, "startDate", "2026-08-15"), Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR")));
+        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/verify", "Verify Razorpay HMAC SHA256 payment signature & activate membership", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "sig...", "planId", 1, "startDate", "2026-08-15"), Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully")));
+        endpoints.add(createEndpoint("Payments", "GET", "/api/payment/history", "Get user's previous payment transactions history", true, null, List.of(Map.of("id", 1, "razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "amount", 499.0, "currency", "INR", "planName", "Monthly Starter Plan", "status", "SUCCESS", "paymentDate", "2026-08-13T16:20:00"))));
 
-        // 5. User Active Membership
+        // 5. User Active Membership & Payments
         endpoints.add(createEndpoint("User Membership", "GET", "/api/user/membership", "Get user's current active membership status, plan name, start date & expiry", true, null, Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15", "planExpiryDate", "2026-09-15T23:59:59", "daysRemaining", 30)));
+        endpoints.add(createEndpoint("User Membership", "GET", "/api/user/payments", "Get user payment transaction history", true, null, List.of(Map.of("id", 1, "razorpayOrderId", "order_MZk123456", "amount", 499.0, "status", "SUCCESS"))));
 
         // 6. Water Intake Tracking
         endpoints.add(createEndpoint("Water Intake", "GET", "/api/user/water", "Get today's water intake & daily target", true, null, Map.of("waterIntakeMl", 1250, "targetWaterMl", 2500, "percentage", 50.0, "date", "2026-08-13")));
         endpoints.add(createEndpoint("Water Intake", "POST", "/api/user/water", "Log or update water intake (actions: ADD, SET, RESET)", true, Map.of("amountMl", 250, "action", "ADD"), Map.of("waterIntakeMl", 1500, "targetWaterMl", 2500, "percentage", 60.0)));
 
         // 7. User Profile, Routine, Streaks & Schedule
-        endpoints.add(createEndpoint("User Profile", "GET", "/api/user/profile", "Get logged-in user profile with membership status & start date", true, null, Map.of("id", 1, "name", "John", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15")));
+        endpoints.add(createEndpoint("User Profile", "GET", "/api/user/profile", "Get logged-in user profile with membership status", true, null, Map.of("id", 1, "name", "John", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan")));
         endpoints.add(createEndpoint("User Profile", "PUT", "/api/user/profile", "Update user profile details", true, Map.of("name", "John Doe", "age", 25, "weight", 75.0, "height", 178.0), Map.of("id", 1, "name", "John Doe")));
         endpoints.add(createEndpoint("User Profile", "PATCH", "/api/user/profile/photo", "Upload profile photo (multipart key 'file')", true, "FormData with file", Map.of("profilePhotoUrl", "/uploads/profile_1.jpg")));
         endpoints.add(createEndpoint("User Profile", "PATCH", "/api/user/onboarding", "Set onboarding completion status", true, Map.of("completed", true), Map.of("onboardingCompleted", true)));
@@ -118,11 +120,13 @@ public class ApiDocsController {
         ));
 
         // Payments
-        paths.put("/api/payment/create-order", Map.of("post", createOperation("Create Razorpay Order", "Generate Razorpay Order ID by planId & optional startDate (YYYY-MM-DD, today or future)", true, Map.of("planId", 1, "startDate", "2026-08-15"), Map.of("200", createResponse("Razorpay Order Details", Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR"))))));
-        paths.put("/api/payment/verify", Map.of("post", createOperation("Verify Razorpay Payment", "Verify Razorpay HMAC SHA256 signature & activate membership starting on startDate (today or future)", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "9f8e7d6c...", "planId", 1, "startDate", "2026-08-15"), Map.of("200", createResponse("Verification Status", Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully starting on 2026-08-15"))))));
+        paths.put("/api/payment/create-order", Map.of("post", createOperation("Create Razorpay Order", "Generate Razorpay Order ID by planId & optional startDate", true, Map.of("planId", 1, "startDate", "2026-08-15"), Map.of("200", createResponse("Razorpay Order Details", Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR"))))));
+        paths.put("/api/payment/verify", Map.of("post", createOperation("Verify Razorpay Payment", "Verify Razorpay HMAC SHA256 signature & activate membership", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "9f8e7d6c...", "planId", 1, "startDate", "2026-08-15"), Map.of("200", createResponse("Verification Status", Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully"))))));
+        paths.put("/api/payment/history", Map.of("get", createOperation("Get Payment History", "Get user's previous payment transactions history", true, null, Map.of("200", createResponse("Payment History List", List.of(Map.of("id", 1, "razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "amount", 499.0, "currency", "INR", "planName", "Monthly Starter Plan", "status", "SUCCESS", "paymentDate", "2026-08-13T16:20:00")))))));
 
-        // User Active Membership
+        // User Active Membership & Payments
         paths.put("/api/user/membership", Map.of("get", createOperation("Get User Active Membership", "Get user's current active membership status, plan name, start date & expiry", true, null, Map.of("200", createResponse("Membership Status", Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15", "planExpiryDate", "2026-09-15T23:59:59", "daysRemaining", 30))))));
+        paths.put("/api/user/payments", Map.of("get", createOperation("Get User Payments", "Get user payment transaction history", true, null, Map.of("200", createResponse("User Payments History", List.of(Map.of("id", 1, "razorpayOrderId", "order_MZk123456", "amount", 499.0, "status", "SUCCESS")))))));
 
         // Water
         paths.put("/api/user/water", Map.of(
@@ -132,7 +136,7 @@ public class ApiDocsController {
 
         // User Profile, Routine, Streaks & Schedule
         paths.put("/api/user/profile", Map.of(
-                "get", createOperation("Get User Profile", "Get current user profile details with active membership & start date", true, null, Map.of("200", createResponse("User Profile", Map.of("id", 1, "name", "John Doe", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15")))),
+                "get", createOperation("Get User Profile", "Get current user profile details with active membership", true, null, Map.of("200", createResponse("User Profile", Map.of("id", 1, "name", "John Doe", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan")))),
                 "put", createOperation("Update User Profile", "Update user profile fields", true, Map.of("name", "John Doe", "age", 25, "weight", 75.0, "height", 178.0), Map.of("200", createResponse("Updated Profile", Map.of("id", 1, "name", "John Doe"))))
         ));
 
@@ -173,7 +177,7 @@ public class ApiDocsController {
         ));
 
         // Analytics
-        paths.put("/api/analytics/summary", Map.of("get", createOperation("Get Analytics Summary", "Get daily & weekly analytics summary", true, null, Map.of("200", createResponse("Analytics Summary", Map.of("dailySteps", 5000, "dailyCalories", 350, "dailyWaterIntakeMl", 1250, "targetWaterMl", 2500))))));
+        paths.put("/api/analytics/summary", Map.of("get", createOperation("Get Analytics Summary", "Get daily & weekly fitness analytics summary", true, null, Map.of("200", createResponse("Analytics Summary", Map.of("dailySteps", 5000, "dailyCalories", 350, "dailyWaterIntakeMl", 1250, "targetWaterMl", 2500))))));
         paths.put("/api/analytics/daily", Map.of("post", createOperation("Log Daily Analytics", "Log daily steps, calories, active minutes & water intake", true, Map.of("steps", 6000, "caloriesBurned", 400.0, "activeMinutes", 45, "waterIntakeMl", 1500), Map.of("200", Map.of("description", "Daily analytics logged")))));
         paths.put("/api/analytics/water", Map.of(
                 "get", createOperation("Get Water Intake Status", "Get today's water intake status", true, null, Map.of("200", createResponse("Water Intake Status", Map.of("waterIntakeMl", 1250, "targetWaterMl", 2500)))),
