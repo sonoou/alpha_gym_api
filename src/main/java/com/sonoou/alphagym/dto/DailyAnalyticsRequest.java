@@ -5,6 +5,8 @@ public class DailyAnalyticsRequest {
     private Integer steps;
     private Double caloriesBurned;
     private Integer activeMinutes;
+    private Integer waterIntakeMl;
+    private Integer targetWaterMl;
 
     public DailyAnalyticsRequest() {}
 
@@ -16,4 +18,10 @@ public class DailyAnalyticsRequest {
 
     public Integer getActiveMinutes() { return activeMinutes; }
     public void setActiveMinutes(Integer activeMinutes) { this.activeMinutes = activeMinutes; }
+
+    public Integer getWaterIntakeMl() { return waterIntakeMl; }
+    public void setWaterIntakeMl(Integer waterIntakeMl) { this.waterIntakeMl = waterIntakeMl; }
+
+    public Integer getTargetWaterMl() { return targetWaterMl; }
+    public void setTargetWaterMl(Integer targetWaterMl) { this.targetWaterMl = targetWaterMl; }
 }

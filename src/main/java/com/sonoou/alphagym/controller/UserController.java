@@ -2,6 +2,7 @@ package com.sonoou.alphagym.controller;
 
 import com.sonoou.alphagym.dto.*;
 import com.sonoou.alphagym.entity.WorkoutEntity;
+import com.sonoou.alphagym.service.AnalyticsService;
 import com.sonoou.alphagym.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,9 +16,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final AnalyticsService analyticsService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AnalyticsService analyticsService) {
         this.userService = userService;
+        this.analyticsService = analyticsService;
     }
 
     @GetMapping("/profile")
@@ -92,5 +95,18 @@ public class UserController {
                                                       @RequestBody ScheduleDto dto) {
         ScheduleDto schedule = userService.saveSchedule(authentication.getName(), dayOfWeek, dto);
         return ResponseEntity.ok(schedule);
+    }
+
+    @GetMapping("/water")
+    public ResponseEntity<WaterIntakeResponse> getWaterIntake(Authentication authentication) {
+        WaterIntakeResponse response = analyticsService.getWaterIntake(authentication.getName());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/water")
+    public ResponseEntity<WaterIntakeResponse> updateWaterIntake(Authentication authentication,
+                                                                   @RequestBody WaterIntakeRequest request) {
+        WaterIntakeResponse response = analyticsService.updateWaterIntake(authentication.getName(), request);
+        return ResponseEntity.ok(response);
     }
 }

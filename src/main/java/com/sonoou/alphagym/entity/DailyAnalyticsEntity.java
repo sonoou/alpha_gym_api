@@ -29,6 +29,12 @@ public class DailyAnalyticsEntity {
     @Column(nullable = false)
     private Integer activeMinutes = 0;
 
+    @Column(nullable = false)
+    private Integer waterIntakeMl = 0;
+
+    @Column(nullable = false)
+    private Integer targetWaterMl = 2500;
+
     public DailyAnalyticsEntity() {}
 
     public Long getId() { return id; }
@@ -48,4 +54,10 @@ public class DailyAnalyticsEntity {
 
     public Integer getActiveMinutes() { return activeMinutes; }
     public void setActiveMinutes(Integer activeMinutes) { this.activeMinutes = activeMinutes; }
+
+    public Integer getWaterIntakeMl() { return waterIntakeMl; }
+    public void setWaterIntakeMl(Integer waterIntakeMl) { this.waterIntakeMl = waterIntakeMl; }
+
+    public Integer getTargetWaterMl() { return targetWaterMl; }
+    public void setTargetWaterMl(Integer targetWaterMl) { this.targetWaterMl = targetWaterMl; }
 }

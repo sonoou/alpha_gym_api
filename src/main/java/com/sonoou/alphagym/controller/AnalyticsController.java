@@ -2,6 +2,8 @@ package com.sonoou.alphagym.controller;
 
 import com.sonoou.alphagym.dto.AnalyticsSummaryResponse;
 import com.sonoou.alphagym.dto.DailyAnalyticsRequest;
+import com.sonoou.alphagym.dto.WaterIntakeRequest;
+import com.sonoou.alphagym.dto.WaterIntakeResponse;
 import com.sonoou.alphagym.service.AnalyticsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -28,5 +30,18 @@ public class AnalyticsController {
                                                    @RequestBody DailyAnalyticsRequest request) {
         analyticsService.saveDaily(authentication.getName(), request);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/water")
+    public ResponseEntity<WaterIntakeResponse> getWaterIntake(Authentication authentication) {
+        WaterIntakeResponse response = analyticsService.getWaterIntake(authentication.getName());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/water")
+    public ResponseEntity<WaterIntakeResponse> updateWaterIntake(Authentication authentication,
+                                                                   @RequestBody WaterIntakeRequest request) {
+        WaterIntakeResponse response = analyticsService.updateWaterIntake(authentication.getName(), request);
+        return ResponseEntity.ok(response);
     }
 }
