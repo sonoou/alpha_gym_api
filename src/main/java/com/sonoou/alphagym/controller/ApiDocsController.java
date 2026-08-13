@@ -36,18 +36,18 @@ public class ApiDocsController {
         endpoints.add(createEndpoint("Membership Plans", "POST", "/api/plans", "Create a new membership plan", true, Map.of("name", "VIP Plan", "amount", 3999.0, "currency", "INR", "durationMonths", 12), Map.of("id", 4, "name", "VIP Plan", "amount", 3999.0)));
 
         // 4. Payments (Razorpay)
-        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/create-order", "Create Razorpay payment order by planId or custom amount", true, Map.of("planId", 1), Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR")));
-        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/verify", "Verify Razorpay HMAC SHA256 payment signature & activate membership", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "sig...", "planId", 1), Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully")));
+        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/create-order", "Create Razorpay payment order by planId (optional startDate YYYY-MM-DD, must be today or future)", true, Map.of("planId", 1, "startDate", "2026-08-15"), Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR")));
+        endpoints.add(createEndpoint("Payments", "POST", "/api/payment/verify", "Verify Razorpay HMAC SHA256 payment signature & activate membership from startDate (today or future)", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "sig...", "planId", 1, "startDate", "2026-08-15"), Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully starting on 2026-08-15")));
 
         // 5. User Active Membership
-        endpoints.add(createEndpoint("User Membership", "GET", "/api/user/membership", "Get user's current active membership status, plan name & expiry", true, null, Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planExpiryDate", "2026-09-13T15:58:30", "daysRemaining", 30)));
+        endpoints.add(createEndpoint("User Membership", "GET", "/api/user/membership", "Get user's current active membership status, plan name, start date & expiry", true, null, Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15", "planExpiryDate", "2026-09-15T23:59:59", "daysRemaining", 30)));
 
         // 6. Water Intake Tracking
         endpoints.add(createEndpoint("Water Intake", "GET", "/api/user/water", "Get today's water intake & daily target", true, null, Map.of("waterIntakeMl", 1250, "targetWaterMl", 2500, "percentage", 50.0, "date", "2026-08-13")));
         endpoints.add(createEndpoint("Water Intake", "POST", "/api/user/water", "Log or update water intake (actions: ADD, SET, RESET)", true, Map.of("amountMl", 250, "action", "ADD"), Map.of("waterIntakeMl", 1500, "targetWaterMl", 2500, "percentage", 60.0)));
 
         // 7. User Profile, Routine, Streaks & Schedule
-        endpoints.add(createEndpoint("User Profile", "GET", "/api/user/profile", "Get logged-in user profile with membership status", true, null, Map.of("id", 1, "name", "John", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan")));
+        endpoints.add(createEndpoint("User Profile", "GET", "/api/user/profile", "Get logged-in user profile with membership status & start date", true, null, Map.of("id", 1, "name", "John", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15")));
         endpoints.add(createEndpoint("User Profile", "PUT", "/api/user/profile", "Update user profile details", true, Map.of("name", "John Doe", "age", 25, "weight", 75.0, "height", 178.0), Map.of("id", 1, "name", "John Doe")));
         endpoints.add(createEndpoint("User Profile", "PATCH", "/api/user/profile/photo", "Upload profile photo (multipart key 'file')", true, "FormData with file", Map.of("profilePhotoUrl", "/uploads/profile_1.jpg")));
         endpoints.add(createEndpoint("User Profile", "PATCH", "/api/user/onboarding", "Set onboarding completion status", true, Map.of("completed", true), Map.of("onboardingCompleted", true)));
@@ -118,11 +118,11 @@ public class ApiDocsController {
         ));
 
         // Payments
-        paths.put("/api/payment/create-order", Map.of("post", createOperation("Create Razorpay Order", "Generate Razorpay Order ID by planId or custom amount", true, Map.of("planId", 1), Map.of("200", createResponse("Razorpay Order Details", Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR"))))));
-        paths.put("/api/payment/verify", Map.of("post", createOperation("Verify Razorpay Payment", "Verify Razorpay HMAC SHA256 payment signature & activate membership", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "9f8e7d6c...", "planId", 1), Map.of("200", createResponse("Verification Status", Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully"))))));
+        paths.put("/api/payment/create-order", Map.of("post", createOperation("Create Razorpay Order", "Generate Razorpay Order ID by planId & optional startDate (YYYY-MM-DD, today or future)", true, Map.of("planId", 1, "startDate", "2026-08-15"), Map.of("200", createResponse("Razorpay Order Details", Map.of("orderId", "order_MZk123456", "keyId", "rzp_test_...", "amountInPaisa", 49900, "currency", "INR"))))));
+        paths.put("/api/payment/verify", Map.of("post", createOperation("Verify Razorpay Payment", "Verify Razorpay HMAC SHA256 signature & activate membership starting on startDate (today or future)", true, Map.of("razorpayOrderId", "order_MZk123456", "razorpayPaymentId", "pay_MZn876543", "razorpaySignature", "9f8e7d6c...", "planId", 1, "startDate", "2026-08-15"), Map.of("200", createResponse("Verification Status", Map.of("status", "SUCCESS", "message", "Payment verified & membership activated successfully starting on 2026-08-15"))))));
 
         // User Active Membership
-        paths.put("/api/user/membership", Map.of("get", createOperation("Get User Active Membership", "Get user's current active membership status, plan name & expiry", true, null, Map.of("200", createResponse("Membership Status", Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planExpiryDate", "2026-09-13T15:58:30", "daysRemaining", 30))))));
+        paths.put("/api/user/membership", Map.of("get", createOperation("Get User Active Membership", "Get user's current active membership status, plan name, start date & expiry", true, null, Map.of("200", createResponse("Membership Status", Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15", "planExpiryDate", "2026-09-15T23:59:59", "daysRemaining", 30))))));
 
         // Water
         paths.put("/api/user/water", Map.of(
@@ -132,7 +132,7 @@ public class ApiDocsController {
 
         // User Profile, Routine, Streaks & Schedule
         paths.put("/api/user/profile", Map.of(
-                "get", createOperation("Get User Profile", "Get current user profile details with active membership", true, null, Map.of("200", createResponse("User Profile", Map.of("id", 1, "name", "John Doe", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan")))),
+                "get", createOperation("Get User Profile", "Get current user profile details with active membership & start date", true, null, Map.of("200", createResponse("User Profile", Map.of("id", 1, "name", "John Doe", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15")))),
                 "put", createOperation("Update User Profile", "Update user profile fields", true, Map.of("name", "John Doe", "age", 25, "weight", 75.0, "height", 178.0), Map.of("200", createResponse("Updated Profile", Map.of("id", 1, "name", "John Doe"))))
         ));
 

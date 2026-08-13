@@ -1,6 +1,8 @@
 package com.sonoou.alphagym.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
 
 public class PaymentVerificationRequest {
 
@@ -15,6 +17,9 @@ public class PaymentVerificationRequest {
 
     private Long planId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+
     public PaymentVerificationRequest() {}
 
     public String getRazorpayOrderId() { return razorpayOrderId; }
@@ -28,4 +33,7 @@ public class PaymentVerificationRequest {
 
     public Long getPlanId() { return planId; }
     public void setPlanId(Long planId) { this.planId = planId; }
+
+    public LocalDate getStartDate() { return startDate; }
+    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
 }

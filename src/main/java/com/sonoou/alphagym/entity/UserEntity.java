@@ -43,6 +43,7 @@ public class UserEntity {
     private Set<Long> bookmarkedWorkoutIds = new HashSet<>();
 
     private String activePlanName;
+    private LocalDateTime planStartDate;
     private LocalDateTime planExpiryDate;
 
     @Column(nullable = false)
@@ -108,6 +109,9 @@ public class UserEntity {
 
     public String getActivePlanName() { return activePlanName; }
     public void setActivePlanName(String activePlanName) { this.activePlanName = activePlanName; }
+
+    public LocalDateTime getPlanStartDate() { return planStartDate; }
+    public void setPlanStartDate(LocalDateTime planStartDate) { this.planStartDate = planStartDate; }
 
     public LocalDateTime getPlanExpiryDate() { return planExpiryDate; }
     public void setPlanExpiryDate(LocalDateTime planExpiryDate) { this.planExpiryDate = planExpiryDate; }

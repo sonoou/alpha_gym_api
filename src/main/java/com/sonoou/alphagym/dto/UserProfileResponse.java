@@ -16,6 +16,7 @@ public class UserProfileResponse {
     private Integer totalWorkoutsCompleted;
     private Boolean isMembershipActive;
     private String activePlanName;
+    private String planStartDate;
     private String planExpiryDate;
 
     public UserProfileResponse() {}
@@ -61,6 +62,9 @@ public class UserProfileResponse {
 
     public String getActivePlanName() { return activePlanName; }
     public void setActivePlanName(String activePlanName) { this.activePlanName = activePlanName; }
+
+    public String getPlanStartDate() { return planStartDate; }
+    public void setPlanStartDate(String planStartDate) { this.planStartDate = planStartDate; }
 
     public String getPlanExpiryDate() { return planExpiryDate; }
     public void setPlanExpiryDate(String planExpiryDate) { this.planExpiryDate = planExpiryDate; }

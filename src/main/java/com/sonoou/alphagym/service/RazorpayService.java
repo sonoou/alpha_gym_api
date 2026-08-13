@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -40,6 +41,14 @@ public class RazorpayService {
 
     public RazorpayOrderResponse createOrder(CreateOrderRequest request) {
         try {
+            // Validate startDate if provided
+            if (request.getStartDate() != null) {
+                LocalDate today = LocalDate.now();
+                if (request.getStartDate().isBefore(today)) {
+                    throw new IllegalArgumentException("Membership start date cannot be in the past. It must be today (" + today + ") or a future date.");
+                }
+            }
+
             Double finalAmount = request.getAmount();
             String currency = request.getCurrency() != null ? request.getCurrency() : defaultCurrency;
             String receipt = request.getReceipt();
@@ -83,6 +92,13 @@ public class RazorpayService {
 
     public PaymentVerificationResponse verifyPayment(String userEmail, PaymentVerificationRequest request) {
         try {
+            LocalDate today = LocalDate.now();
+            LocalDate start = request.getStartDate() != null ? request.getStartDate() : today;
+
+            if (start.isBefore(today)) {
+                return new PaymentVerificationResponse("FAILED", "Membership start date cannot be in the past. It must be today (" + today + ") or a future date.", request.getRazorpayPaymentId());
+            }
+
             JSONObject options = new JSONObject();
             options.put("razorpay_order_id", request.getRazorpayOrderId());
             options.put("razorpay_payment_id", request.getRazorpayPaymentId());
@@ -104,14 +120,18 @@ public class RazorpayService {
                             }
                         }
 
+                        LocalDateTime startDateTime = start.atStartOfDay();
+                        LocalDateTime expiryDateTime = start.plusMonths(durationMonths).atTime(23, 59, 59);
+
                         user.setActivePlanName(planName);
+                        user.setPlanStartDate(startDateTime);
+                        user.setPlanExpiryDate(expiryDateTime);
                         user.setMembershipActive(true);
-                        user.setPlanExpiryDate(LocalDateTime.now().plusMonths(durationMonths));
                         userRepository.save(user);
                     });
                 }
 
-                return new PaymentVerificationResponse("SUCCESS", "Payment verified & membership activated successfully", request.getRazorpayPaymentId());
+                return new PaymentVerificationResponse("SUCCESS", "Payment verified & membership activated successfully starting on " + start.toString(), request.getRazorpayPaymentId());
             } else {
                 return new PaymentVerificationResponse("FAILED", "Invalid payment signature verification", request.getRazorpayPaymentId());
             }

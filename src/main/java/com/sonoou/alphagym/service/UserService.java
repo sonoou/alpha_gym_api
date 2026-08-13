@@ -150,6 +150,7 @@ public class UserService {
         UserEntity user = getUserByEmail(email);
         boolean isActive = user.getMembershipActive();
         String planName = user.getActivePlanName();
+        String startDate = user.getPlanStartDate() != null ? user.getPlanStartDate().toLocalDate().toString() : null;
         String expiry = user.getPlanExpiryDate() != null ? user.getPlanExpiryDate().toString() : null;
         
         long daysRemaining = 0;
@@ -158,7 +159,7 @@ public class UserService {
             if (daysRemaining < 0) daysRemaining = 0;
         }
 
-        return new UserMembershipResponse(isActive, planName, expiry, daysRemaining);
+        return new UserMembershipResponse(isActive, planName, startDate, expiry, daysRemaining);
     }
 
     private UserProfileResponse mapToProfileResponse(UserEntity user) {
@@ -177,6 +178,7 @@ public class UserService {
         response.setTotalWorkoutsCompleted(user.getTotalWorkoutsCompleted());
         response.setIsMembershipActive(user.getMembershipActive());
         response.setActivePlanName(user.getActivePlanName());
+        response.setPlanStartDate(user.getPlanStartDate() != null ? user.getPlanStartDate().toLocalDate().toString() : null);
         response.setPlanExpiryDate(user.getPlanExpiryDate() != null ? user.getPlanExpiryDate().toString() : null);
         return response;
     }
