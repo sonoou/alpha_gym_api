@@ -1,21 +1,23 @@
 package com.sonoou.alphagym.dto;
 
-import jakarta.validation.constraints.NotNull;
-
 public class CreateOrderRequest {
 
-    @NotNull
+    private Long planId;
     private Double amount;
     private String currency;
     private String receipt;
 
     public CreateOrderRequest() {}
 
-    public CreateOrderRequest(Double amount, String currency, String receipt) {
+    public CreateOrderRequest(Long planId, Double amount, String currency, String receipt) {
+        this.planId = planId;
         this.amount = amount;
         this.currency = currency;
         this.receipt = receipt;
     }
+
+    public Long getPlanId() { return planId; }
+    public void setPlanId(Long planId) { this.planId = planId; }
 
     public Double getAmount() { return amount; }
     public void setAmount(Double amount) { this.amount = amount; }

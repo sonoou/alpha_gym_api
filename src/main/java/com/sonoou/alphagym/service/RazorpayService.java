@@ -7,6 +7,8 @@ import com.sonoou.alphagym.dto.CreateOrderRequest;
 import com.sonoou.alphagym.dto.PaymentVerificationRequest;
 import com.sonoou.alphagym.dto.PaymentVerificationResponse;
 import com.sonoou.alphagym.dto.RazorpayOrderResponse;
+import com.sonoou.alphagym.entity.MembershipPlanEntity;
+import com.sonoou.alphagym.repository.MembershipPlanRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,13 +27,39 @@ public class RazorpayService {
     @Value("${app.razorpay.currency:INR}")
     private String defaultCurrency;
 
+    private final MembershipPlanRepository planRepository;
+
+    public RazorpayService(MembershipPlanRepository planRepository) {
+        this.planRepository = planRepository;
+    }
+
     public RazorpayOrderResponse createOrder(CreateOrderRequest request) {
         try {
+            Double finalAmount = request.getAmount();
+            String currency = request.getCurrency() != null ? request.getCurrency() : defaultCurrency;
+            String receipt = request.getReceipt();
+
+            if (request.getPlanId() != null) {
+                MembershipPlanEntity plan = planRepository.findById(request.getPlanId())
+                        .orElseThrow(() -> new IllegalArgumentException("Membership Plan not found with ID: " + request.getPlanId()));
+                finalAmount = plan.getAmount();
+                if (plan.getCurrency() != null) {
+                    currency = plan.getCurrency();
+                }
+                receipt = "plan_" + plan.getId() + "_" + UUID.randomUUID().toString().substring(0, 6);
+            }
+
+            if (finalAmount == null || finalAmount <= 0) {
+                throw new IllegalArgumentException("Invalid payment amount");
+            }
+
+            if (receipt == null) {
+                receipt = "rcpt_" + UUID.randomUUID().toString().substring(0, 8);
+            }
+
             RazorpayClient razorpayClient = new RazorpayClient(razorpayKeyId, razorpayKeySecret);
 
-            int amountInPaisa = (int) Math.round(request.getAmount() * 100);
-            String currency = request.getCurrency() != null ? request.getCurrency() : defaultCurrency;
-            String receipt = request.getReceipt() != null ? request.getReceipt() : "rcpt_" + UUID.randomUUID().toString().substring(0, 8);
+            int amountInPaisa = (int) Math.round(finalAmount * 100);
 
             JSONObject orderRequest = new JSONObject();
             orderRequest.put("amount", amountInPaisa);
