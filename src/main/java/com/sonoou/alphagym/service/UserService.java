@@ -146,6 +146,21 @@ public class UserService {
         return new ScheduleDto(saved.getDayOfWeek(), saved.getWorkoutIds(), saved.getFocusArea(), saved.getNotes());
     }
 
+    public UserMembershipResponse getUserMembership(String email) {
+        UserEntity user = getUserByEmail(email);
+        boolean isActive = user.getMembershipActive();
+        String planName = user.getActivePlanName();
+        String expiry = user.getPlanExpiryDate() != null ? user.getPlanExpiryDate().toString() : null;
+        
+        long daysRemaining = 0;
+        if (user.getPlanExpiryDate() != null) {
+            daysRemaining = java.time.Duration.between(java.time.LocalDateTime.now(), user.getPlanExpiryDate()).toDays();
+            if (daysRemaining < 0) daysRemaining = 0;
+        }
+
+        return new UserMembershipResponse(isActive, planName, expiry, daysRemaining);
+    }
+
     private UserProfileResponse mapToProfileResponse(UserEntity user) {
         UserProfileResponse response = new UserProfileResponse();
         response.setId(user.getId());
@@ -160,6 +175,9 @@ public class UserService {
         response.setProfilePhotoUrl(user.getProfilePhotoUrl());
         response.setCurrentStreakDays(user.getCurrentStreakDays());
         response.setTotalWorkoutsCompleted(user.getTotalWorkoutsCompleted());
+        response.setIsMembershipActive(user.getMembershipActive());
+        response.setActivePlanName(user.getActivePlanName());
+        response.setPlanExpiryDate(user.getPlanExpiryDate() != null ? user.getPlanExpiryDate().toString() : null);
         return response;
     }
 }

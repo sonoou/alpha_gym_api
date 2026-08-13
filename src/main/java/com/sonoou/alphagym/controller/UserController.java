@@ -109,4 +109,10 @@ public class UserController {
         WaterIntakeResponse response = analyticsService.updateWaterIntake(authentication.getName(), request);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/membership")
+    public ResponseEntity<UserMembershipResponse> getUserMembership(Authentication authentication) {
+        UserMembershipResponse response = userService.getUserMembership(authentication.getName());
+        return ResponseEntity.ok(response);
+    }
 }

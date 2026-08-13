@@ -42,6 +42,12 @@ public class UserEntity {
     @Column(name = "workout_id")
     private Set<Long> bookmarkedWorkoutIds = new HashSet<>();
 
+    private String activePlanName;
+    private LocalDateTime planExpiryDate;
+
+    @Column(nullable = false)
+    private Boolean membershipActive = false;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -99,6 +105,21 @@ public class UserEntity {
 
     public Set<Long> getBookmarkedWorkoutIds() { return bookmarkedWorkoutIds; }
     public void setBookmarkedWorkoutIds(Set<Long> bookmarkedWorkoutIds) { this.bookmarkedWorkoutIds = bookmarkedWorkoutIds; }
+
+    public String getActivePlanName() { return activePlanName; }
+    public void setActivePlanName(String activePlanName) { this.activePlanName = activePlanName; }
+
+    public LocalDateTime getPlanExpiryDate() { return planExpiryDate; }
+    public void setPlanExpiryDate(LocalDateTime planExpiryDate) { this.planExpiryDate = planExpiryDate; }
+
+    public Boolean getMembershipActive() {
+        if (planExpiryDate != null && LocalDateTime.now().isAfter(planExpiryDate)) {
+            return false;
+        }
+        return membershipActive != null ? membershipActive : false;
+    }
+
+    public void setMembershipActive(Boolean membershipActive) { this.membershipActive = membershipActive; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

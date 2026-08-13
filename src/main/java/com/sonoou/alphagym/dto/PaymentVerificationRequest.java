@@ -13,6 +13,8 @@ public class PaymentVerificationRequest {
     @NotBlank
     private String razorpaySignature;
 
+    private Long planId;
+
     public PaymentVerificationRequest() {}
 
     public String getRazorpayOrderId() { return razorpayOrderId; }
@@ -23,4 +25,7 @@ public class PaymentVerificationRequest {
 
     public String getRazorpaySignature() { return razorpaySignature; }
     public void setRazorpaySignature(String razorpaySignature) { this.razorpaySignature = razorpaySignature; }
+
+    public Long getPlanId() { return planId; }
+    public void setPlanId(Long planId) { this.planId = planId; }
 }

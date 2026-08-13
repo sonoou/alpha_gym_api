@@ -7,6 +7,7 @@ import com.sonoou.alphagym.dto.RazorpayOrderResponse;
 import com.sonoou.alphagym.service.RazorpayService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,8 +27,10 @@ public class PaymentController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<PaymentVerificationResponse> verifyPayment(@Valid @RequestBody PaymentVerificationRequest request) {
-        PaymentVerificationResponse response = razorpayService.verifyPayment(request);
+    public ResponseEntity<PaymentVerificationResponse> verifyPayment(Authentication authentication,
+                                                                   @Valid @RequestBody PaymentVerificationRequest request) {
+        String email = authentication != null ? authentication.getName() : null;
+        PaymentVerificationResponse response = razorpayService.verifyPayment(email, request);
         return ResponseEntity.ok(response);
     }
 }

@@ -8,11 +8,14 @@ import com.sonoou.alphagym.dto.PaymentVerificationRequest;
 import com.sonoou.alphagym.dto.PaymentVerificationResponse;
 import com.sonoou.alphagym.dto.RazorpayOrderResponse;
 import com.sonoou.alphagym.entity.MembershipPlanEntity;
+import com.sonoou.alphagym.entity.UserEntity;
 import com.sonoou.alphagym.repository.MembershipPlanRepository;
+import com.sonoou.alphagym.repository.UserRepository;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -28,9 +31,11 @@ public class RazorpayService {
     private String defaultCurrency;
 
     private final MembershipPlanRepository planRepository;
+    private final UserRepository userRepository;
 
-    public RazorpayService(MembershipPlanRepository planRepository) {
+    public RazorpayService(MembershipPlanRepository planRepository, UserRepository userRepository) {
         this.planRepository = planRepository;
+        this.userRepository = userRepository;
     }
 
     public RazorpayOrderResponse createOrder(CreateOrderRequest request) {
@@ -76,7 +81,7 @@ public class RazorpayService {
         }
     }
 
-    public PaymentVerificationResponse verifyPayment(PaymentVerificationRequest request) {
+    public PaymentVerificationResponse verifyPayment(String userEmail, PaymentVerificationRequest request) {
         try {
             JSONObject options = new JSONObject();
             options.put("razorpay_order_id", request.getRazorpayOrderId());
@@ -86,7 +91,27 @@ public class RazorpayService {
             boolean isValidSignature = Utils.verifyPaymentSignature(options, razorpayKeySecret);
 
             if (isValidSignature) {
-                return new PaymentVerificationResponse("SUCCESS", "Payment verified successfully", request.getRazorpayPaymentId());
+                if (userEmail != null) {
+                    userRepository.findByEmail(userEmail).ifPresent(user -> {
+                        String planName = "Gym Membership";
+                        int durationMonths = 1;
+
+                        if (request.getPlanId() != null) {
+                            MembershipPlanEntity plan = planRepository.findById(request.getPlanId()).orElse(null);
+                            if (plan != null) {
+                                planName = plan.getName();
+                                durationMonths = plan.getDurationMonths() != null ? plan.getDurationMonths() : 1;
+                            }
+                        }
+
+                        user.setActivePlanName(planName);
+                        user.setMembershipActive(true);
+                        user.setPlanExpiryDate(LocalDateTime.now().plusMonths(durationMonths));
+                        userRepository.save(user);
+                    });
+                }
+
+                return new PaymentVerificationResponse("SUCCESS", "Payment verified & membership activated successfully", request.getRazorpayPaymentId());
             } else {
                 return new PaymentVerificationResponse("FAILED", "Invalid payment signature verification", request.getRazorpayPaymentId());
             }

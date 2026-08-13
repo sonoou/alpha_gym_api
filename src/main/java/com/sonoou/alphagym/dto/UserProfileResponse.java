@@ -14,6 +14,9 @@ public class UserProfileResponse {
     private String profilePhotoUrl;
     private Integer currentStreakDays;
     private Integer totalWorkoutsCompleted;
+    private Boolean isMembershipActive;
+    private String activePlanName;
+    private String planExpiryDate;
 
     public UserProfileResponse() {}
 
@@ -52,4 +55,13 @@ public class UserProfileResponse {
 
     public Integer getTotalWorkoutsCompleted() { return totalWorkoutsCompleted; }
     public void setTotalWorkoutsCompleted(Integer totalWorkoutsCompleted) { this.totalWorkoutsCompleted = totalWorkoutsCompleted; }
+
+    public Boolean getIsMembershipActive() { return isMembershipActive; }
+    public void setIsMembershipActive(Boolean isMembershipActive) { this.isMembershipActive = isMembershipActive; }
+
+    public String getActivePlanName() { return activePlanName; }
+    public void setActivePlanName(String activePlanName) { this.activePlanName = activePlanName; }
+
+    public String getPlanExpiryDate() { return planExpiryDate; }
+    public void setPlanExpiryDate(String planExpiryDate) { this.planExpiryDate = planExpiryDate; }
 }
