@@ -6,9 +6,13 @@ import com.sonoou.alphagym.entity.MembershipPlanEntity;
 import com.sonoou.alphagym.repository.CategoryRepository;
 import com.sonoou.alphagym.repository.ExerciseTypeRepository;
 import com.sonoou.alphagym.repository.MembershipPlanRepository;
+import com.sonoou.alphagym.repository.WorkoutRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.util.List;
 
 @Component
@@ -17,13 +21,19 @@ public class DataInitializer implements CommandLineRunner {
     private final MembershipPlanRepository planRepository;
     private final CategoryRepository categoryRepository;
     private final ExerciseTypeRepository exerciseTypeRepository;
+    private final WorkoutRepository workoutRepository;
+    private final DataSource dataSource;
 
     public DataInitializer(MembershipPlanRepository planRepository,
                            CategoryRepository categoryRepository,
-                           ExerciseTypeRepository exerciseTypeRepository) {
+                           ExerciseTypeRepository exerciseTypeRepository,
+                           WorkoutRepository workoutRepository,
+                           DataSource dataSource) {
         this.planRepository = planRepository;
         this.categoryRepository = categoryRepository;
         this.exerciseTypeRepository = exerciseTypeRepository;
+        this.workoutRepository = workoutRepository;
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -68,10 +78,11 @@ public class DataInitializer implements CommandLineRunner {
                     new CategoryEntity("Abs", "Core strength, abdominal crunches, and stability training"),
                     new CategoryEntity("Forearms", "Grip strength, forearm curls, and wrist flexors"),
                     new CategoryEntity("Quads", "Quadriceps, squats, leg extensions, and lower body power"),
-                    new CategoryEntity("Calves", "Calf raises, lower leg endurance, and definition")
+                    new CategoryEntity("Calves", "Calf raises, lower leg endurance, and definition"),
+                    new CategoryEntity("Back", "Lats, upper/lower traps, rhomboids, and spinal erector workouts")
             );
             categoryRepository.saveAll(defaultCategories);
-            System.out.println(">>> Seeded 8 default Workout Categories into Database!");
+            System.out.println(">>> Seeded 9 default Workout Categories into Database!");
         }
 
         // 3. Seed Types of Exercises (Extracted from Cleveland Clinic)
@@ -122,6 +133,17 @@ public class DataInitializer implements CommandLineRunner {
             );
             exerciseTypeRepository.saveAll(exerciseTypes);
             System.out.println(">>> Seeded 7 Exercise Types into Database from Cleveland Clinic!");
+        }
+
+        // 4. Seed ExRx Workouts if table is empty
+        if (workoutRepository.count() == 0) {
+            try {
+                ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource("workouts_seed.sql"));
+                populator.execute(dataSource);
+                System.out.println(">>> Seeded 565 ExRx Workouts into Database!");
+            } catch (Exception e) {
+                System.err.println(">>> Error executing workouts_seed.sql: " + e.getMessage());
+            }
         }
     }
 }
