@@ -44,11 +44,15 @@ public class ApiDocsController {
         endpoints.add(createEndpoint("User Membership", "GET", "/api/user/membership", "Get user's current active membership status, plan name, start date & expiry", true, null, Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15", "planExpiryDate", "2026-09-15T23:59:59", "daysRemaining", 30)));
         endpoints.add(createEndpoint("User Membership", "GET", "/api/user/payments", "Get user payment transaction history", true, null, List.of(Map.of("id", 1, "razorpayOrderId", "order_MZk123456", "amount", 499.0, "status", "SUCCESS"))));
 
-        // 6. Water Intake Tracking
+        // 6. Exercise Types (Cleveland Clinic)
+        endpoints.add(createEndpoint("Exercise Types", "GET", "/api/exercise-types", "Get all types of exercises (Resistance, Cardio, HIIT, LISS, Flexibility, Balance, Sport-Specific)", false, null, List.of(Map.of("id", 1, "name", "Resistance Training", "description", "Produces tension in muscles...", "examples", "Squats, Bench Press", "benefits", "Builds strength"))));
+        endpoints.add(createEndpoint("Exercise Types", "GET", "/api/types", "Alias for getting all types of exercises", false, null, "List of ExerciseType objects"));
+
+        // 7. Water Intake Tracking
         endpoints.add(createEndpoint("Water Intake", "GET", "/api/user/water", "Get today's water intake & daily target", true, null, Map.of("waterIntakeMl", 1250, "targetWaterMl", 2500, "percentage", 50.0, "date", "2026-08-13")));
         endpoints.add(createEndpoint("Water Intake", "POST", "/api/user/water", "Log or update water intake (actions: ADD, SET, RESET)", true, Map.of("amountMl", 250, "action", "ADD"), Map.of("waterIntakeMl", 1500, "targetWaterMl", 2500, "percentage", 60.0)));
 
-        // 7. User Profile, Routine, Streaks & Schedule
+        // 8. User Profile, Routine, Streaks & Schedule
         endpoints.add(createEndpoint("User Profile", "GET", "/api/user/profile", "Get logged-in user profile with membership status", true, null, Map.of("id", 1, "name", "John", "email", "john@example.com", "isMembershipActive", true, "activePlanName", "Monthly Starter Plan")));
         endpoints.add(createEndpoint("User Profile", "PUT", "/api/user/profile", "Update user profile details", true, Map.of("name", "John Doe", "age", 25, "weight", 75.0, "height", 178.0), Map.of("id", 1, "name", "John Doe")));
         endpoints.add(createEndpoint("User Profile", "PATCH", "/api/user/profile/photo", "Upload profile photo (multipart key 'file')", true, "FormData with file", Map.of("profilePhotoUrl", "/uploads/profile_1.jpg")));
@@ -61,19 +65,19 @@ public class ApiDocsController {
         endpoints.add(createEndpoint("User Schedule", "GET", "/api/user/schedule/{dayOfWeek}", "Get user schedule for day (e.g. MONDAY)", true, null, Map.of("dayOfWeek", "MONDAY", "focusArea", "Chest & Triceps")));
         endpoints.add(createEndpoint("User Schedule", "PUT", "/api/user/schedule/{dayOfWeek}", "Update schedule for day", true, Map.of("focusArea", "Legs & Core", "notes", "Heavy Squats"), Map.of("dayOfWeek", "MONDAY", "focusArea", "Legs & Core")));
 
-        // 8. Workouts & Categories
+        // 9. Workouts & Categories
         endpoints.add(createEndpoint("Workouts", "GET", "/api/workouts", "Get workouts list (optional ?category=Chest filter)", false, null, "List of Workout objects"));
         endpoints.add(createEndpoint("Workouts", "GET", "/api/categories", "Get workout categories list", false, null, "List of Category objects"));
         endpoints.add(createEndpoint("Workouts", "POST", "/api/workouts/upload-video", "Upload 9:16 workout video (multipart key 'file')", true, "FormData with video file", Map.of("videoUrl", "/uploads/videos/workout_1.mp4")));
 
-        // 9. Community Feed
+        // 10. Community Feed
         endpoints.add(createEndpoint("Community Feed", "GET", "/api/feed", "Get community posts feed", true, null, "List of CommunityPost objects"));
         endpoints.add(createEndpoint("Community Feed", "POST", "/api/feed", "Create new post (optional image upload)", true, Map.of("caption", "Morning Leg Day!"), Map.of("id", 1, "caption", "Morning Leg Day!")));
         endpoints.add(createEndpoint("Community Feed", "POST", "/api/feed/{postId}/like", "Toggle like on post", true, null, Map.of("postId", 1, "likesCount", 12)));
         endpoints.add(createEndpoint("Community Feed", "GET", "/api/feed/{postId}/comments", "Get comments on post", true, null, "List of comments"));
         endpoints.add(createEndpoint("Community Feed", "POST", "/api/feed/{postId}/comments", "Add comment to post", true, Map.of("text", "Great form!"), Map.of("id", 1, "text", "Great form!")));
 
-        // 10. Analytics
+        // 11. Analytics
         endpoints.add(createEndpoint("Analytics", "GET", "/api/analytics/summary", "Get daily & weekly fitness analytics summary", true, null, Map.of("dailySteps", 5000, "dailyCalories", 350, "dailyWaterIntakeMl", 1250, "targetWaterMl", 2500)));
         endpoints.add(createEndpoint("Analytics", "POST", "/api/analytics/daily", "Log daily steps, calories, active minutes & water", true, Map.of("steps", 6000, "caloriesBurned", 400.0, "activeMinutes", 45, "waterIntakeMl", 1500), "HTTP 200 OK"));
         endpoints.add(createEndpoint("Analytics", "GET", "/api/analytics/water", "Get water intake status", true, null, Map.of("waterIntakeMl", 1250, "targetWaterMl", 2500)));
@@ -127,6 +131,10 @@ public class ApiDocsController {
         // User Active Membership & Payments
         paths.put("/api/user/membership", Map.of("get", createOperation("Get User Active Membership", "Get user's current active membership status, plan name, start date & expiry", true, null, Map.of("200", createResponse("Membership Status", Map.of("isMembershipActive", true, "activePlanName", "Monthly Starter Plan", "planStartDate", "2026-08-15", "planExpiryDate", "2026-09-15T23:59:59", "daysRemaining", 30))))));
         paths.put("/api/user/payments", Map.of("get", createOperation("Get User Payments", "Get user payment transaction history", true, null, Map.of("200", createResponse("User Payments History", List.of(Map.of("id", 1, "razorpayOrderId", "order_MZk123456", "amount", 499.0, "status", "SUCCESS")))))));
+
+        // Exercise Types
+        paths.put("/api/exercise-types", Map.of("get", createOperation("Get Exercise Types", "Fetch all exercise types with descriptions and benefits (from Cleveland Clinic)", false, null, Map.of("200", createResponse("Exercise Types List", List.of(Map.of("id", 1, "name", "Resistance Training", "description", "Produces tension in muscles...", "examples", "Squats, Bicep curls", "benefits", "Increases strength and bone density")))))));
+        paths.put("/api/types", Map.of("get", createOperation("Get Types Alias", "Alias route for /api/exercise-types", false, null, Map.of("200", createResponse("Exercise Types List", List.of(Map.of("id", 1, "name", "Resistance Training")))))));
 
         // Water
         paths.put("/api/user/water", Map.of(

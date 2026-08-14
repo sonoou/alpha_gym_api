@@ -1,8 +1,10 @@
 package com.sonoou.alphagym.config;
 
 import com.sonoou.alphagym.entity.CategoryEntity;
+import com.sonoou.alphagym.entity.ExerciseTypeEntity;
 import com.sonoou.alphagym.entity.MembershipPlanEntity;
 import com.sonoou.alphagym.repository.CategoryRepository;
+import com.sonoou.alphagym.repository.ExerciseTypeRepository;
 import com.sonoou.alphagym.repository.MembershipPlanRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -14,11 +16,14 @@ public class DataInitializer implements CommandLineRunner {
 
     private final MembershipPlanRepository planRepository;
     private final CategoryRepository categoryRepository;
+    private final ExerciseTypeRepository exerciseTypeRepository;
 
     public DataInitializer(MembershipPlanRepository planRepository,
-                           CategoryRepository categoryRepository) {
+                           CategoryRepository categoryRepository,
+                           ExerciseTypeRepository exerciseTypeRepository) {
         this.planRepository = planRepository;
         this.categoryRepository = categoryRepository;
+        this.exerciseTypeRepository = exerciseTypeRepository;
     }
 
     @Override
@@ -67,6 +72,56 @@ public class DataInitializer implements CommandLineRunner {
             );
             categoryRepository.saveAll(defaultCategories);
             System.out.println(">>> Seeded 8 default Workout Categories into Database!");
+        }
+
+        // 3. Seed Types of Exercises (Extracted from Cleveland Clinic)
+        if (exerciseTypeRepository.count() == 0) {
+            List<ExerciseTypeEntity> exerciseTypes = List.of(
+                    new ExerciseTypeEntity(
+                            "Resistance Training",
+                            "Produces tension in your muscles by using weights, resistance bands, kettlebells, or bodyweight. Encompasses isotonic exercises (push, pull, lift) and isometric exercises (holding positions) to build muscle and increase overall strength.",
+                            "Bicep curls, squats, bench presses, push-ups, pull-ups, planks, wall sits, glute bridges",
+                            "Builds muscle, improves muscular endurance, increases bone density, assists fall prevention, and enhances mental clarity."
+                    ),
+                    new ExerciseTypeEntity(
+                            "Cardio (Cardiovascular Exercise)",
+                            "Workouts that get your blood pumping harder and faster, increasing heart rate and oxygen consumption to strengthen heart and lungs.",
+                            "Running, brisk walking, cycling, swimming, rowing, stair climbing, elliptical training",
+                            "Improves heart health, lowers risk of heart disease, diabetes, and high blood pressure, and boosts daily energy."
+                    ),
+                    new ExerciseTypeEntity(
+                            "High-Intensity Interval Training (HIIT)",
+                            "A cardio format featuring short, high-effort bursts of intense activity followed by brief periods of lower-intensity recovery.",
+                            "Squat jumps, burpees, sprint intervals, jumping jacks, calisthenics circuits, stationary bike sprints",
+                            "Conditions the body for big bursts of energy, builds athletic strength, and burns calories rapidly in a short duration."
+                    ),
+                    new ExerciseTypeEntity(
+                            "Low-Intensity Steady-State Cardio (LISS)",
+                            "Long-duration aerobic activity performed at a continuous, low-to-moderate intensity pace.",
+                            "Long-distance walking, hiking, steady jogging, lap swimming, rowing machine, cross-country skiing",
+                            "Builds aerobic stamina and endurance for everyday activities, is joint-friendly, and supports cardiovascular health."
+                    ),
+                    new ExerciseTypeEntity(
+                            "Flexibility Training",
+                            "Stretching exercises that lengthen muscles and connective tissues to prevent stiffness, improve joint range of motion, and protect against injury.",
+                            "Static stretching (holding 30-90s), dynamic stretching (leg swings, arm circles), active and passive stretching, yoga",
+                            "Decreases muscle tightness, improves range of motion, prevents workout injuries, and enhances functional daily mobility."
+                    ),
+                    new ExerciseTypeEntity(
+                            "Balance Exercises",
+                            "Exercises that challenge and strengthen core and stabilizing muscles to maintain postural control and body equilibrium.",
+                            "Single-leg stands, heel-to-toe walking, balance board drills, stability ball exercises, tai chi",
+                            "Prevents falls, improves postural stability, enhances body coordination, and supports healthy longevity."
+                    ),
+                    new ExerciseTypeEntity(
+                            "Sport-Specific Training",
+                            "Targeted training regimens focused on drills, agility, and movement patterns tailored directly to a specific athletic sport.",
+                            "Agility ladder drills, plyometrics, shuttle runs, sport-specific skill drills (basketball footwork, soccer drills)",
+                            "Maximizes athletic performance, refines technique and reaction time, and builds resilience for sport movements."
+                    )
+            );
+            exerciseTypeRepository.saveAll(exerciseTypes);
+            System.out.println(">>> Seeded 7 Exercise Types into Database from Cleveland Clinic!");
         }
     }
 }
