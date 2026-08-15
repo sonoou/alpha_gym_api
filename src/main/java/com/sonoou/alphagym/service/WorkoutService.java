@@ -1,11 +1,16 @@
 package com.sonoou.alphagym.service;
 
 import com.sonoou.alphagym.dto.CategoryRequest;
+import com.sonoou.alphagym.dto.PagedResponse;
 import com.sonoou.alphagym.dto.WorkoutRequest;
 import com.sonoou.alphagym.entity.CategoryEntity;
 import com.sonoou.alphagym.entity.WorkoutEntity;
 import com.sonoou.alphagym.repository.CategoryRepository;
 import com.sonoou.alphagym.repository.WorkoutRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +31,35 @@ public class WorkoutService {
         this.fileStorageService = fileStorageService;
     }
 
+    public PagedResponse<WorkoutEntity> getWorkoutsPaged(
+            String category,
+            String difficulty,
+            String search,
+            int page,
+            int size,
+            String sortBy,
+            String sortDirection) {
+
+        int pageNumber = Math.max(0, page);
+        int pageSize = (size <= 0) ? 20 : Math.min(size, 100);
+
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        String validSortBy = (sortBy == null || sortBy.isBlank()) ? "id" : sortBy;
+        Sort sort = Sort.by(direction, validSortBy);
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<WorkoutEntity> workoutPage = workoutRepository.findWorkoutsWithFilters(category, difficulty, search, pageable);
+
+        return new PagedResponse<>(
+                workoutPage.getContent(),
+                workoutPage.getNumber(),
+                workoutPage.getSize(),
+                workoutPage.getTotalElements(),
+                workoutPage.getTotalPages(),
+                workoutPage.isLast()
+        );
+    }
+
     public List<WorkoutEntity> getWorkouts(String category, String difficulty) {
         if (category != null && !category.isBlank() && difficulty != null && !difficulty.isBlank()) {
             return workoutRepository.findByCategoryAndDifficulty(category, difficulty);
@@ -35,6 +69,10 @@ public class WorkoutService {
             return workoutRepository.findByDifficulty(difficulty);
         }
         return workoutRepository.findAll();
+    }
+
+    public WorkoutEntity getWorkoutById(Long id) {
+        return workoutRepository.findById(id).orElse(null);
     }
 
     public WorkoutEntity createWorkout(WorkoutRequest request) {
