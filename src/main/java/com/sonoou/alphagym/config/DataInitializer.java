@@ -79,10 +79,11 @@ public class DataInitializer implements CommandLineRunner {
                     new CategoryEntity("Forearms", "Grip strength, forearm curls, and wrist flexors"),
                     new CategoryEntity("Quads", "Quadriceps, squats, leg extensions, and lower body power"),
                     new CategoryEntity("Calves", "Calf raises, lower leg endurance, and definition"),
-                    new CategoryEntity("Back", "Lats, upper/lower traps, rhomboids, and spinal erector workouts")
+                    new CategoryEntity("Back", "Lats, upper/lower traps, rhomboids, and spinal erector workouts"),
+                    new CategoryEntity("Triceps", "Triceps extensions, pushdowns, skull crushers, and dips")
             );
             categoryRepository.saveAll(defaultCategories);
-            System.out.println(">>> Seeded 9 default Workout Categories into Database!");
+            System.out.println(">>> Seeded 10 default Workout Categories into Database!");
         }
 
         // 3. Seed Types of Exercises (Extracted from Cleveland Clinic)
