@@ -11,10 +11,11 @@ public class PaymentHistoryResponse {
     private String planName;
     private String status;
     private String paymentDate;
+    private String receiptDownloadUrl;
 
     public PaymentHistoryResponse() {}
 
-    public PaymentHistoryResponse(Long id, String razorpayOrderId, String razorpayPaymentId, Double amount, String currency, Long planId, String planName, String status, String paymentDate) {
+    public PaymentHistoryResponse(Long id, String razorpayOrderId, String razorpayPaymentId, Double amount, String currency, Long planId, String planName, String status, String paymentDate, String receiptDownloadUrl) {
         this.id = id;
         this.razorpayOrderId = razorpayOrderId;
         this.razorpayPaymentId = razorpayPaymentId;
@@ -24,6 +25,7 @@ public class PaymentHistoryResponse {
         this.planName = planName;
         this.status = status;
         this.paymentDate = paymentDate;
+        this.receiptDownloadUrl = receiptDownloadUrl;
     }
 
     public Long getId() { return id; }
@@ -52,4 +54,7 @@ public class PaymentHistoryResponse {
 
     public String getPaymentDate() { return paymentDate; }
     public void setPaymentDate(String paymentDate) { this.paymentDate = paymentDate; }
+
+    public String getReceiptDownloadUrl() { return receiptDownloadUrl; }
+    public void setReceiptDownloadUrl(String receiptDownloadUrl) { this.receiptDownloadUrl = receiptDownloadUrl; }
 }

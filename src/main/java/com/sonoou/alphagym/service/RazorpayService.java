@@ -203,7 +203,8 @@ public class RazorpayService {
                 tx.getPlanId(),
                 tx.getPlanName(),
                 tx.getStatus(),
-                tx.getCreatedAt() != null ? tx.getCreatedAt().toString() : null
+                tx.getCreatedAt() != null ? tx.getCreatedAt().toString() : null,
+                "/api/payment/receipt/" + tx.getId() + "/download"
         )).collect(Collectors.toList());
     }
 }
