@@ -141,7 +141,7 @@ public class DataInitializer implements CommandLineRunner {
             try {
                 ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource("workouts_seed.sql"));
                 populator.execute(dataSource);
-                System.out.println(">>> Seeded 565 ExRx Workouts into Database!");
+                System.out.println(">>> Seeded 695 ExRx Workouts into Database!");
             } catch (Exception e) {
                 System.err.println(">>> Error executing workouts_seed.sql: " + e.getMessage());
             }

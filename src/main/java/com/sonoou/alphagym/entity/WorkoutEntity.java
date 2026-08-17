@@ -20,8 +20,11 @@ public class WorkoutEntity {
     private String category;
     private String difficulty; // e.g. Beginner, Intermediate, Advanced
     private Integer durationMinutes;
+    @Column(columnDefinition = "TEXT")
     private String videoUrl;
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
+    @Column(columnDefinition = "TEXT")
     private String targetMuscles;
 
     private LocalDateTime createdAt;
