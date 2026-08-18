@@ -28,8 +28,9 @@ public class ApiDocsController {
         endpoints.add(createEndpoint("Health & System", "GET", "/api/docs/openapi.json", "Standard OpenAPI 3.0.1 Specification JSON (Import into Postman/Apidog)", false, null, "OpenAPI 3.0 JSON schema"));
 
         // 2. Authentication
-        endpoints.add(createEndpoint("Auth", "POST", "/api/auth/signup", "Register a new user account", false, Map.of("name", "John Doe", "email", "john@example.com", "password", "secret123"), Map.of("token", "jwt_token...", "name", "John Doe", "email", "john@example.com")));
-        endpoints.add(createEndpoint("Auth", "POST", "/api/auth/login", "Authenticate user and get Bearer JWT token", false, Map.of("email", "john@example.com", "password", "secret123"), Map.of("token", "jwt_token...", "name", "John Doe", "email", "john@example.com")));
+        endpoints.add(createEndpoint("Auth", "POST", "/api/auth/signup", "Register a new user account", false, Map.of("name", "John Doe", "email", "john@example.com", "password", "secret123"), Map.of("token", "jwt_token...", "name", "John Doe", "email", "john@example.com", "role", "ROLE_USER")));
+        endpoints.add(createEndpoint("Auth", "POST", "/api/auth/login", "Authenticate user and get Bearer JWT token", false, Map.of("email", "john@example.com", "password", "secret123"), Map.of("token", "jwt_token...", "name", "John Doe", "email", "john@example.com", "role", "ROLE_USER")));
+        endpoints.add(createEndpoint("Auth", "POST", "/api/auth/admin/login", "Authenticate Admin user (Default: admin@alphagym.com / admin123)", false, Map.of("email", "admin@alphagym.com", "password", "admin123"), Map.of("token", "jwt_token...", "name", "Alpha Veins Admin", "email", "admin@alphagym.com", "role", "ROLE_ADMIN")));
 
         // 3. Membership Plans
         endpoints.add(createEndpoint("Membership Plans", "GET", "/api/plans", "Fetch all active gym membership plans", false, null, List.of(Map.of("id", 1, "name", "Monthly Starter Plan", "amount", 499.0, "currency", "INR", "durationMonths", 1))));
@@ -72,7 +73,6 @@ public class ApiDocsController {
         endpoints.add(createEndpoint("User Routine", "POST", "/api/user/routine", "Add or Remove workout from routine", true, Map.of("workoutId", 5, "action", "ADD"), "Updated routine list"));
         endpoints.add(createEndpoint("User Streaks", "GET", "/api/user/streaks", "Get current workout streaks", true, null, Map.of("currentStreakDays", 7)));
         endpoints.add(createEndpoint("User Streaks", "POST", "/api/user/streaks/complete", "Complete today's workout streak (+1 day)", true, null, Map.of("currentStreakDays", 8)));
-        endpoints.add(createEndpoint("User Streaks", "PUT", "/api/user/streaks", "Set custom streak days", true, Map.of("currentStreakDays", 14), Map.of("currentStreakDays", 14)));
         endpoints.add(createEndpoint("User Schedule", "GET", "/api/user/schedule/{dayOfWeek}", "Get user schedule for day (e.g. MONDAY)", true, null, Map.of("dayOfWeek", "MONDAY", "focusArea", "Chest & Triceps")));
         endpoints.add(createEndpoint("User Schedule", "PUT", "/api/user/schedule/{dayOfWeek}", "Update schedule for day", true, Map.of("focusArea", "Legs & Core", "notes", "Heavy Squats"), Map.of("dayOfWeek", "MONDAY", "focusArea", "Legs & Core")));
 
@@ -120,8 +120,9 @@ public class ApiDocsController {
         paths.put("/api/docs/openapi.json", Map.of("get", createOperation("OpenAPI JSON Specification", "Standard OpenAPI 3.0.1 JSON Spec for Postman/Apidog Import", false, null, Map.of("200", createResponse("OpenAPI JSON Spec", Map.of("openapi", "3.0.1"))))));
 
         // Auth
-        paths.put("/api/auth/signup", Map.of("post", createOperation("User Signup", "Register a new user account", false, Map.of("name", "John Doe", "email", "john@example.com", "password", "secret123"), Map.of("200", createResponse("JWT Auth Token & User info", Map.of("token", "eyJhbGciOi...", "name", "John Doe", "email", "john@example.com"))))));
-        paths.put("/api/auth/login", Map.of("post", createOperation("User Login", "Authenticate user and receive JWT token", false, Map.of("email", "john@example.com", "password", "secret123"), Map.of("200", createResponse("JWT Auth Token & User info", Map.of("token", "eyJhbGciOi...", "name", "John Doe", "email", "john@example.com"))))));
+        paths.put("/api/auth/signup", Map.of("post", createOperation("User Signup", "Register a new user account", false, Map.of("name", "John Doe", "email", "john@example.com", "password", "secret123"), Map.of("200", createResponse("JWT Auth Token & User info", Map.of("token", "eyJhbGciOi...", "name", "John Doe", "email", "john@example.com", "role", "ROLE_USER"))))));
+        paths.put("/api/auth/login", Map.of("post", createOperation("User Login", "Authenticate user and receive JWT token", false, Map.of("email", "john@example.com", "password", "secret123"), Map.of("200", createResponse("JWT Auth Token & User info", Map.of("token", "eyJhbGciOi...", "name", "John Doe", "email", "john@example.com", "role", "ROLE_USER"))))));
+        paths.put("/api/auth/admin/login", Map.of("post", createOperation("Admin Login", "Authenticate Admin user (Default: admin@alphagym.com / admin123)", false, Map.of("email", "admin@alphagym.com", "password", "admin123"), Map.of("200", createResponse("JWT Admin Token & User info", Map.of("token", "eyJhbGciOi...", "name", "Alpha Veins Admin", "email", "admin@alphagym.com", "role", "ROLE_ADMIN"))))));
 
         // Membership Plans
         paths.put("/api/plans", Map.of(
@@ -173,10 +174,7 @@ public class ApiDocsController {
                 "post", createOperation("Update User Routine", "Add or Remove workout from routine", true, Map.of("workoutId", 5, "action", "ADD"), Map.of("200", createResponse("Updated Routine List", List.of(Map.of("id", 5, "name", "Incline Press")))))
         ));
 
-        paths.put("/api/user/streaks", Map.of(
-                "get", createOperation("Get User Streaks", "Get current streak days", true, null, Map.of("200", createResponse("Streaks Details", Map.of("currentStreakDays", 7)))),
-                "put", createOperation("Update User Streaks", "Set custom streak days", true, Map.of("currentStreakDays", 14), Map.of("200", createResponse("Updated Streaks", Map.of("currentStreakDays", 14))))
-        ));
+        paths.put("/api/user/streaks", Map.of("get", createOperation("Get User Streaks", "Get current streak days", true, null, Map.of("200", createResponse("Streaks Details", Map.of("currentStreakDays", 7))))));
         paths.put("/api/user/streaks/complete", Map.of("post", createOperation("Complete Today Workout", "Increment streak days (+1 day)", true, null, Map.of("200", createResponse("Updated Streaks", Map.of("currentStreakDays", 8))))));
 
         paths.put("/api/user/schedule/{dayOfWeek}", Map.of(

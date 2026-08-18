@@ -94,13 +94,47 @@ curl -X POST http://localhost:8080/api/auth/signup \
   "password": "password123"
 }
 ```
-* **Response** (`200 OK`):
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiJ9...",
   "name": "Sonu (Sanjeev)",
-  "email": "sonu@example.com"
+  "email": "sonu@example.com",
+  "role": "ROLE_USER"
 }
+```
+
+---
+
+### 🔹 Admin Login
+`POST /api/auth/admin/login`  
+*Authenticate Gym Owner / Admin account and obtain Admin JWT token.*
+
+* **Auth Required**: `No`
+* **Default Credentials**:
+  * **Email**: `admin@alphagym.com`
+  * **Password**: `admin123`
+* **Request Body** (`application/json`):
+```json
+{
+  "email": "admin@alphagym.com",
+  "password": "admin123"
+}
+```
+* **Response** (`200 OK`):
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "name": "Alpha Veins Admin",
+  "email": "admin@alphagym.com",
+  "onboardingCompleted": true,
+  "role": "ROLE_ADMIN"
+}
+```
+
+```bash
+curl -X POST http://localhost:8080/api/auth/admin/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@alphagym.com","password":"admin123"}'
 ```
 
 ---

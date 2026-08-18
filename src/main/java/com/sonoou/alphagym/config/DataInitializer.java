@@ -3,13 +3,16 @@ package com.sonoou.alphagym.config;
 import com.sonoou.alphagym.entity.CategoryEntity;
 import com.sonoou.alphagym.entity.ExerciseTypeEntity;
 import com.sonoou.alphagym.entity.MembershipPlanEntity;
+import com.sonoou.alphagym.entity.UserEntity;
 import com.sonoou.alphagym.repository.CategoryRepository;
 import com.sonoou.alphagym.repository.ExerciseTypeRepository;
 import com.sonoou.alphagym.repository.MembershipPlanRepository;
+import com.sonoou.alphagym.repository.UserRepository;
 import com.sonoou.alphagym.repository.WorkoutRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -22,23 +25,45 @@ public class DataInitializer implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ExerciseTypeRepository exerciseTypeRepository;
     private final WorkoutRepository workoutRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final DataSource dataSource;
 
     public DataInitializer(MembershipPlanRepository planRepository,
                            CategoryRepository categoryRepository,
                            ExerciseTypeRepository exerciseTypeRepository,
                            WorkoutRepository workoutRepository,
+                           UserRepository userRepository,
+                           PasswordEncoder passwordEncoder,
                            DataSource dataSource) {
         this.planRepository = planRepository;
         this.categoryRepository = categoryRepository;
         this.exerciseTypeRepository = exerciseTypeRepository;
         this.workoutRepository = workoutRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
         this.dataSource = dataSource;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        // 1. Seed Membership Plans
+        // 1. Seed Default Admin User if not exists
+        if (!userRepository.existsByEmail("admin@alphagym.com")) {
+            UserEntity admin = new UserEntity();
+            admin.setEmail("admin@alphagym.com");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setName("Alpha Veins Admin");
+            admin.setRole("ROLE_ADMIN");
+            admin.setAge(30);
+            admin.setGender("OTHER");
+            admin.setFitnessGoal("Gym Administration & Management");
+            admin.setOnboardingCompleted(true);
+            admin.setMembershipActive(true);
+            userRepository.save(admin);
+            System.out.println(">>> Seeded default Admin user (admin@alphagym.com / admin123) into Database!");
+        }
+
+        // 2. Seed Membership Plans
         if (planRepository.count() == 0) {
             MembershipPlanEntity basicPlan = new MembershipPlanEntity(
                     "Monthly Starter Plan",
@@ -68,7 +93,7 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println(">>> Seeded 3 default Gym Membership Plans into Database!");
         }
 
-        // 2. Seed Default Workout Categories
+        // 3. Seed Default Workout Categories
         if (categoryRepository.count() == 0) {
             List<CategoryEntity> defaultCategories = List.of(
                     new CategoryEntity("Neck", "Neck strength and mobility exercises"),
@@ -86,7 +111,7 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println(">>> Seeded 10 default Workout Categories into Database!");
         }
 
-        // 3. Seed Types of Exercises (Extracted from Cleveland Clinic)
+        // 4. Seed Types of Exercises (Extracted from Cleveland Clinic)
         if (exerciseTypeRepository.count() == 0) {
             List<ExerciseTypeEntity> exerciseTypes = List.of(
                     new ExerciseTypeEntity(
@@ -136,7 +161,7 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println(">>> Seeded 7 Exercise Types into Database from Cleveland Clinic!");
         }
 
-        // 4. Seed ExRx Workouts if table is empty
+        // 5. Seed ExRx Workouts if table is empty
         if (workoutRepository.count() == 0) {
             try {
                 ResourceDatabasePopulator populator = new ResourceDatabasePopulator(new ClassPathResource("workouts_seed.sql"));

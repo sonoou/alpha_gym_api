@@ -7,6 +7,7 @@ import com.sonoou.alphagym.entity.UserEntity;
 import com.sonoou.alphagym.repository.UserRepository;
 import com.sonoou.alphagym.security.JwtUtils;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,13 +44,14 @@ public class AuthService {
         user.setHeight(request.getHeight());
         user.setGender(request.getGender());
         user.setFitnessGoal(request.getFitnessGoal());
+        user.setRole("ROLE_USER");
         user.setOnboardingCompleted(false);
 
         UserEntity savedUser = userRepository.save(user);
 
         String token = jwtUtils.generateToken(savedUser.getEmail());
 
-        return new AuthResponse(token, savedUser.getName(), savedUser.getEmail(), savedUser.getOnboardingCompleted());
+        return new AuthResponse(token, savedUser.getName(), savedUser.getEmail(), savedUser.getOnboardingCompleted(), savedUser.getRole());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -61,6 +63,23 @@ public class AuthService {
 
         String token = jwtUtils.generateToken(user.getEmail());
 
-        return new AuthResponse(token, user.getName(), user.getEmail(), user.getOnboardingCompleted());
+        return new AuthResponse(token, user.getName(), user.getEmail(), user.getOnboardingCompleted(), user.getRole());
+    }
+
+    public AuthResponse adminLogin(LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+
+        UserEntity user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        String userRole = user.getRole();
+        if (userRole == null || (!userRole.equalsIgnoreCase("ROLE_ADMIN") && !userRole.equalsIgnoreCase("ADMIN"))) {
+            throw new BadCredentialsException("Access Denied: Administrator privileges required for admin login.");
+        }
+
+        String token = jwtUtils.generateToken(user.getEmail());
+
+        return new AuthResponse(token, user.getName(), user.getEmail(), user.getOnboardingCompleted(), user.getRole());
     }
 }

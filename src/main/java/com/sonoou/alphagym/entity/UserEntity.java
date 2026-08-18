@@ -29,6 +29,9 @@ public class UserEntity {
     @Column(nullable = false)
     private Boolean onboardingCompleted = false;
 
+    @Column(nullable = false)
+    private String role = "ROLE_USER"; // ROLE_USER, ROLE_ADMIN
+
     private String profilePhotoUrl;
 
     @Column(nullable = false)
@@ -94,6 +97,9 @@ public class UserEntity {
 
     public Boolean getOnboardingCompleted() { return onboardingCompleted; }
     public void setOnboardingCompleted(Boolean onboardingCompleted) { this.onboardingCompleted = onboardingCompleted; }
+
+    public String getRole() { return role != null ? role : "ROLE_USER"; }
+    public void setRole(String role) { this.role = role; }
 
     public String getProfilePhotoUrl() { return profilePhotoUrl; }
     public void setProfilePhotoUrl(String profilePhotoUrl) { this.profilePhotoUrl = profilePhotoUrl; }

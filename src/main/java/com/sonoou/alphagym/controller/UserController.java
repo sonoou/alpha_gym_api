@@ -78,13 +78,6 @@ public class UserController {
         return ResponseEntity.ok(streaks);
     }
 
-    @PutMapping("/streaks")
-    public ResponseEntity<StreakResponse> updateStreaks(Authentication authentication,
-                                                        @RequestBody UpdateStreakRequest request) {
-        StreakResponse streaks = userService.updateStreaks(authentication.getName(), request);
-        return ResponseEntity.ok(streaks);
-    }
-
     @GetMapping("/schedule/{dayOfWeek}")
     public ResponseEntity<ScheduleDto> getSchedule(Authentication authentication,
                                                    @PathVariable String dayOfWeek) {

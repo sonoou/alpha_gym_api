@@ -2,13 +2,14 @@ package com.sonoou.alphagym.security;
 
 import com.sonoou.alphagym.entity.UserEntity;
 import com.sonoou.alphagym.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -24,6 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        return new User(userEntity.getEmail(), userEntity.getPassword(), Collections.emptyList());
+        String userRole = userEntity.getRole() != null ? userEntity.getRole() : "ROLE_USER";
+        return new User(userEntity.getEmail(), userEntity.getPassword(), List.of(new SimpleGrantedAuthority(userRole)));
     }
 }
